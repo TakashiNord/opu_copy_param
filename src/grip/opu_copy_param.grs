@@ -1,0 +1,122 @@
+$$ ===================================================================
+$$
+$$      Copyright (c) 2005 —…
+$$                   Unpublished - All rights reserved
+$$
+$$ ===================================================================
+
+$$
+$$ Declarations
+    number / stat
+    entity / ent1, ent2
+    number / opt1, opt2
+    string / optt1(132), optt2(132)
+    string / opst1(132), opst2(132)
+    string / errstr(133)
+
+    gripsw / declrv
+    string / from_oper_name(30) , noper(30)
+    number / usresp
+
+$$ Register and initialize the argument list with UG/Open API.
+step0:
+    ufargs / from_oper_name, noper, usresp , IFERR, steperr:
+    $$from_oper_name='PLANAR_MILL'
+    $$noper='CAVITY_MILL' $$'PLANAR_MILL_1'
+    usresp=0
+    errstr=''
+    optt1=''
+    optt2=''
+    opst1=''
+    opst2=''
+
+$$ Activate manufacturing
+step1:
+    &MODULE = &MACH
+
+$$ Check name oper
+step2:
+    ifthen / 0 == CMPSTR(noper,from_oper_name)
+        errstr='Name operations - source and dest -  identical'
+        jump  / steperr:
+    endif
+
+    stat = MNAMST/noper $$  0 if the operation does not exist
+    errstr=''
+    ifthen / stat == 0
+        errstr='Name operation="'+noper+'"-not exist.'
+        jump  / steperr:
+    endif
+
+    stat = MNAMST/from_oper_name $$  0 if the operation does not exist
+    errstr=''
+    ifthen / stat == 0
+        errstr='Name operation="'+from_oper_name+'"-not exist.'
+        jump  / steperr:
+    endif
+
+$$ Create data, operation
+step3:
+    $$print / from_oper_name + '   ' + noper
+
+    $$ Operation Entity Identifier
+    ent1=&OPRNAM(from_oper_name,IFERR,steperr:)
+    ent2=&OPRNAM(noper,IFERR,steperr:)
+
+    $$ - Read or Write the Type of Template Operation
+    optt1=&OPERTP(from_oper_name,IFERR,steperr:)
+    optt2=&OPERTP(noper,IFERR,steperr:)
+    $$print / optt1 + '   ' + optt2
+
+    ifthen / 0 <> CMPSTR(optt1,optt2)
+        print / from_oper_name + '   ' + noper
+        errstr='Type of Template Operation-(source,dest)-not identical'
+        jump  / steperr:
+        errstr=''
+    endif
+
+    $$ - Read or Write the Subtype of Template Operation
+    opst1=&OPERST(from_oper_name,IFERR,steperr:)
+    opst2=&OPERST(noper,IFERR,steperr:)
+    $$print / opst1 + '   ' + opst2
+
+    $$ Get operation type.$$
+    opt1 = &OPTYP(from_oper_name)
+    opt2 = &OPTYP(noper)
+    $$print / ISTR(opt1) + '   ' + ISTR(opt2)
+
+    ifthen / opt1 <> opt2
+        print / from_oper_name + '   ' + noper
+        errstr='Type of Operation-(source,dest)-not identical'
+        jump  / steperr:
+        errstr=''
+    endif
+
+    errstr='Error - cant REINIT operation'
+    OPER/REINIT,noper, FROM, from_oper_name, IFERR, steperr:
+    errstr=''
+    
+    $$OPER/ RETRVE,noper
+    &OPERTP(noper,IFERR,steperr:)=optt1
+    &OPERST(noper,IFERR,steperr:)=opst1
+
+$$ Save
+step4:
+    &GENPTH=&NO
+    errstr='Error - cant save operation'
+    OPER/ SAVE ,IFERR, steperr: $$ Save operation.
+    errstr=''
+
+$$ Inform user of any errors
+steperr:
+    ifthen / errstr <> ''
+        eject / print
+        print / 'Error create operation'
+        print / '  Reason: ' + errstr
+        usresp=-1
+    endif
+
+$$ Done
+    $$Delete/ent1,ent2
+Done:
+    halt

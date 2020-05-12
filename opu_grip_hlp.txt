@@ -1,0 +1,150 @@
+Template Operations
+A Template Operation is activated using:
+
+OPER/NEW
+
+This command is described below.
+
+The valid GPAs available for this submodule are listed by type at the end of the section.
+
+Name
+MCINIT
+
+Synopsis
+MCINIT/{START|END|IN},FROM,{'from_oper_name'|'template_type','template_subtype'} [,IFERR,label:]
+
+Description
+This command allows you to specify the portion of the toolpath to be initialized.
+
+This is not available for Sequential Surface or Drive Curve Lathe.
+
+Parameters
+START|END|IN
+ These minor words indicate the start, end or inpath post commands are to be initialized.
+ 
+FROM,from_oper_name'
+ The name of the compatible operation.
+ 
+FROM,'template_type'
+ The name of an Operation Template Type.
+ 
+'template_subtype'
+ The name of an Operation Template Subype.
+ 
+IFERR,label:
+ The label to which the program will jump if the system can not perform OPER/MCINIT.
+ 
+
+Name
+OPER/NEW - Create a New Operation from a template
+
+Synopsis
+OPER/NEW[,OPNAME,'operation_name'],'template_type','template_subtype'[,IFERR,label:]
+
+Description
+This command allows you to create an operation of the specified type and subtype. An error message is displayed if you attempt to create an operation using an operation template without a specified Operation Template Set; or if the 'operation_name', 'template_type', or 'template_subtype' are invalid.
+
+Parameters
+OPNAME,'operation_name'
+ A string or string variable representing the name of the operation. If this is not specified, the default name is used.
+ 
+'template_type'
+ A string or string variable representing the the Operation Template Type. The name must exist in the Operation Template Set.
+ 
+'template_subtype'
+ A string or string variable representing the Operation Template Subtype. The name must be one of the subtypes defined in the Operation Template Type.
+ 
+IFERR,label:
+ The label to which the program will jump if the system can not perform OPER/NEW.
+ 
+
+ 
+Example
+OPER/NEW,OPNAME,'POCKET1','mill_planar','ROUGH_FOLLOW'
+
+  or
+
+OPER/NEW,OPNAME,'HOLEPAT1','drill','DRILLING'
+
+"OPER/NEW,*" is equivalent to the APPLY button in the Operation Creation dialog in interactive NX. "mill_planar" and "drill" are CAM template part files and are equivalent to the TYPE option in the Operation Creation dialog. "ROUGH_FOLLOW", "DRILLING", etc. are equivalent to the SUBTYPE icons in the Operation Creation dialog and represent the operations available in the TYPE part file.
+
+ 
+
+Name
+OPER/REINIT
+
+Synopsis
+OPER/REINIT,'operation_name',FROM{,'from_oper_name'|'template_type','template_subtype' [,IFERR,label:]
+
+Description
+This command allows you to re-initialize operation parameters or post commands.
+
+This is not available for Sequential Surface or Drive Curve Lathe.
+
+Parameters
+'operation_name'
+ A string or string variable representing the name of the operation to be re-initialized.
+ 
+FROM,from_oper_name'
+ The name of the operation (in the current part file) whose parameters will be used to re-initialize 'operation_name'.
+ 
+FROM,'template_type'
+ The name of an Operation Template Type (in the active operation template set) whose parameters will be used to re-initialize 'operation_name'.
+ 
+'template_subtype'
+ The name of an Operation Template Subype (in the active operation template set) whose parameters will be used to re-initialize 'operation_name'.
+ 
+IFERR,label:
+ The label to which the program will jump if the system can not perform OPER/REINIT.
+ 
+
+Name
+&OPERST - Read/Write the Operation Subtype
+
+Synopsis
+&OPERST('operation_name'[,IFERR,label:])
+
+Description
+This command allows you to read or write the template subtype from which the operation was initialized. A blank string is returned if the 'operation name' was not initialized from an Operation Template when the EDA is used to read the Subtype.
+
+Characteristics
+Read/WriteString
+
+Parameters
+'operation_name'
+ A string or string variable representing the name of the operation.
+ 
+IFERR,label:
+ The label to which the program will jump if the system can not perform &OPERST.
+ 
+
+Name
+&OPERTP - Read/Write the Operation Type
+
+Synopsis
+&OPERTP('operation name'[,IFERR,label:])
+
+Description
+This command allows you to read or write the template type from which the operation was initialized. A blank string is returned if the 'operation name' was not initialized from an Operation Template when the EDA is used to read the Type.
+
+Characteristics
+Read/WriteString
+
+Parameters
+'operation name
+ A string or string variable representing the name of the operation.
+ 
+IFERR,label:
+ The label to which the program will jump if the system can not perform &OPERTP.
+ 
+
+Template Operation GPAs
+Template Operation GPA Type: Unique
+ 
+GPA
+ Description
+ 
+OPTSET
+ Read/Set the Current Active
+Template Set.
+ 
